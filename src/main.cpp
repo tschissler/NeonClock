@@ -78,36 +78,39 @@ int groupSizes[7] = {5, 5, 6, 5, 5, 6, 5};
  * Main loop.
  */
 void loop() {
-  for (int i = 0; i <220; i++) {
-    leds[i] = CRGB::Black;
-  }
-  FastLED.show();
+//   for (int i = 0; i <220; i++) {
+//     leds[i] = CRGB::Black;
+//   }
+//   FastLED.show();
 
-//int digit = 0;
+// //int digit = 0;
 
-for (int digit = 0; digit < 10; digit++) {
-int index = 0;
+// for (int digit = 0; digit < 10; digit++) {
+// int index = 0;
 
-for (int i = 0; i < 7; i++) {
-    for (int j = 0; j < groupSizes[i]; j++) {
-        DigitLEDs[index++] = Segments[digit][i];
-    }
-}
+// for (int i = 0; i < 7; i++) {
+//     for (int j = 0; j < groupSizes[i]; j++) {
+//         DigitLEDs[index++] = Segments[digit][i];
+//     }
+// }
 
-// Außen 32
-// Innen 5
-  for (int i = 0; i < 37; i++) {
-    leds[i] = CRGB::Green * DigitLEDs[i];
-    // if (i >= 10)
-    //   leds[i - 10] = CRGB::Black;
+// // Außen 32
+// // Innen 5
+//   for (int i = 0; i < 37; i++) {
+//     leds[i] = CRGB::Green * DigitLEDs[i];
+//     // if (i >= 10)
+//     //   leds[i - 10] = CRGB::Black;
 
 
-    //delay(2000);
-  }
-    FastLED.show();
-  delay(1000);
-}
+//     //delay(2000);
+//   }
+//     FastLED.show();
+//   delay(1000);
+// }
+
+//   rfidReader.readCard();
+   delay(100);
 
   rfidReader.readCard();
-  delay(100);
+
 } //loop()

@@ -16,7 +16,7 @@ void RFIDReader::readTag() {
 
 void RFIDReader::removedTag() {
   bNewInt = true;
-  Serial.println(F("Card removed"));
+  Serial.println(F("Tag removed"));
 }
 
 void RFIDReader::init() {
@@ -47,8 +47,8 @@ void RFIDReader::init() {
     mfrc522.PCD_WriteRegister(mfrc522.ComIEnReg, regVal);
 
     /*Activate the interrupt*/
-    attachInterrupt(digitalPinToInterrupt(IRQ_PIN), std::bind(&RFIDReader::readTag, this), FALLING);
-    attachInterrupt(digitalPinToInterrupt(IRQ_PIN), std::bind(&RFIDReader::removedTag, this), RISING);
+    //attachInterrupt(digitalPinToInterrupt(IRQ_PIN), std::bind(&RFIDReader::readTag, this), FALLING);
+    //attachInterrupt(digitalPinToInterrupt(IRQ_PIN), std::bind(&RFIDReader::removedTag, this), RISING);
 
     bNewInt = false; //interrupt flag
 }
@@ -65,21 +65,39 @@ void dump_byte_array(byte *buffer, byte bufferSize) {
 
 void RFIDReader::readCard() {
 
-    Serial.println(F("Reading card..."));
-    Serial.println(F(bNewInt ? "New interrupt" : "No new interrupt"));
+    //Serial.println(F("Reading card..."));
 
-    if (bNewInt) { //new read interrupt
-        Serial.print(F("Interrupt. "));
-        mfrc522.PICC_ReadCardSerial(); //read the tag data
-        // Show some details of the PICC (that is: the tag/card)
-        Serial.print(F("Card UID:"));
-        dump_byte_array(mfrc522.uid.uidByte, mfrc522.uid.size);
-        Serial.println();
+	// Reset the loop if no new card present on the sensor/reader. This saves the entire process when idle.
+	if ( ! mfrc522.PICC_IsNewCardPresent()) {
+		return;
+	}
 
-        clearInt();
-        mfrc522.PICC_HaltA();
-        bNewInt = false;
-    }
+	// Select one of the cards
+	if ( ! mfrc522.PICC_ReadCardSerial()) {
+		return;
+	}
+
+	// Dump debug info about the card; PICC_HaltA() is automatically called
+	mfrc522.PICC_DumpToSerial(&(mfrc522.uid));
+
+
+
+
+
+    // Serial.println(F(bNewInt ? "New interrupt" : "No new interrupt"));
+
+    // if (bNewInt) { //new read interrupt
+    //     Serial.print(F("Interrupt. "));
+    //     mfrc522.PICC_ReadCardSerial(); //read the tag data
+    //     // Show some details of the PICC (that is: the tag/card)
+    //     Serial.print(F("Card UID:"));
+    //     dump_byte_array(mfrc522.uid.uidByte, mfrc522.uid.size);
+    //     Serial.println();
+
+    //     clearInt();
+    //     mfrc522.PICC_HaltA();
+    //     bNewInt = false;
+    // }
 
     // // The receiving block needs regular retriggering (tell the tag it should transmit??)
     // // (mfrc522.PCD_WriteRegister(mfrc522.FIFODataReg,mfrc522.PICC_CMD_REQA);)
