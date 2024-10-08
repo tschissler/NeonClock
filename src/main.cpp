@@ -35,18 +35,26 @@
 #include <SD.h>
 
 #define NUM_LEDS 180
-#define DATA_PIN 15
+#define DATA_PIN 16
 
 // Define the array of leds
 CRGB leds[NUM_LEDS];
 
 #define RST_PIN         22          // Configurable, see typical pin layout above
-#define SS_PIN          15          // Configurable, see typical pin layout above
 #define IRQ_PIN         21          // Configurable, depends on hardware
 #define SDA_PIN         5           // Configurable, see typical pin layout above
 #define MOSI_PIN        23          // Configurable, see typical pin layout above
 #define MISO_PIN        19          // Configurable, see typical pin layout above
-#define SCLK_PIN        18          
+#define SCLK_PIN        18         
+
+// SD Card
+#define SD_CS_PIN       15
+#define SD_MOSI_PIN     13
+#define SD_MISO_PIN     12
+#define SD_SCLK_PIN     14
+
+SPIClass sd_spi(HSPI);  // Use HSPI for Device 1
+SPIClass rfid_spi(VSPI);  // Use VSPI for Device 2
 
 MFRC522 mfrc522(SDA_PIN, RST_PIN);   // Create MFRC522 instance.
 
@@ -73,6 +81,30 @@ void removedCard() {
   bNewInt = true;
   Serial.println(F("Card removed"));
 }
+
+// void setup() {
+//   Serial.begin(115200); 
+
+//   while (!SD.begin(SD_CS_PIN)) {
+//     Serial.println(F("SD CARD FAILED, OR NOT PRESENT!"));
+//     delay(1000);
+//   }
+
+//   Serial.println(F("SD CARD INITIALIZED."));
+
+//   if (!SD.exists("/esp32.txt")) {
+//     Serial.println(F("esp32.txt doesn't exist. Creating esp32.txt file..."));
+//     // create a new file by opening a new file and immediately close it
+//     myFile = SD.open("/esp32.txt", FILE_WRITE);
+//     myFile.close();
+//   }
+
+//   // recheck if file is created or not
+//   if (SD.exists("/esp32.txt"))
+//     Serial.println(F("esp32.txt exists on SD Card."));
+//   else
+//     Serial.println(F("esp32.txt doesn't exist on SD Card."));
+// }
 /**
  * Initialize.
  */
@@ -83,6 +115,7 @@ void setup() {
   Serial.println(F("Start setup"));
 
   SPI.begin(SCLK_PIN, MISO_PIN, MOSI_PIN, SDA_PIN);          // Init SPI bus
+  sd_spi.begin(SD_SCLK_PIN, SD_MISO_PIN, SD_MOSI_PIN, SD_CS_PIN); // Init SPI bus
 
   if (!rtc.begin()) {
     Serial.println("Couldn't find RTC");
@@ -95,25 +128,25 @@ void setup() {
   Serial.print("RTC is running - Current time: ");
   Serial.println(rtc.now().timestamp(DateTime::TIMESTAMP_FULL));
 
-  // if (!SD.begin(SS_PIN)) {
-  //   Serial.println(F("SD CARD FAILED, OR NOT PRESENT!"));
-  // }
-  // else {
-  //   Serial.println(F("SD CARD INITIALIZED."));
-  // }
+  if (!SD.begin(SD_CS_PIN, sd_spi)) {
+    Serial.println(F("SD CARD FAILED, OR NOT PRESENT!"));
+  }
+  else {
+    Serial.println(F("SD CARD INITIALIZED."));
+  }
 
-  // if (!SD.exists("/esp32.txt")) {
-  //   Serial.println(F("esp32.txt doesn't exist. Creating esp32.txt file..."));
-  //   // create a new file by opening a new file and immediately close it
-  //   myFile = SD.open("/esp32.txt", FILE_WRITE);
-  //   myFile.close();
-  // }
+  if (!SD.exists("/esp32.txt")) {
+    Serial.println(F("esp32.txt doesn't exist. Creating esp32.txt file..."));
+    // create a new file by opening a new file and immediately close it
+    myFile = SD.open("/esp32.txt", FILE_WRITE);
+    myFile.close();
+  }
 
-  // // recheck if file is created or not
-  // if (SD.exists("/esp32.txt"))
-  //   Serial.println(F("esp32.txt exists on SD Card."));
-  // else
-  //   Serial.println(F("esp32.txt doesn't exist on SD Card."));
+  // recheck if file is created or not
+  if (SD.exists("/esp32.txt"))
+    Serial.println(F("esp32.txt exists on SD Card."));
+  else
+    Serial.println(F("esp32.txt doesn't exist on SD Card."));
 
   mfrc522.PCD_Init(); // Init MFRC522 card
 
