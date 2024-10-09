@@ -16,7 +16,7 @@
 class RFIDReader {
 public:
     void init();
-    void readCard();
+    String readCard();
     
 private:
     MFRC522 mfrc522;

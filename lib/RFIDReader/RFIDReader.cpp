@@ -56,30 +56,36 @@ void RFIDReader::init() {
 /**
  * Helper routine to dump a byte array as hex values to Serial.
  */
-void dump_byte_array(byte *buffer, byte bufferSize) {
-  for (byte i = 0; i < bufferSize; i++) {
-    Serial.print(buffer[i] < 0x10 ? " 0" : " ");
-    Serial.print(buffer[i], HEX);
-  }
+String dump_byte_array(byte *buffer, byte bufferSize) {
+    std::string result;
+    for (byte i = 0; i < bufferSize; i++) {
+        char hex[3]; // Two hex digits and a null terminator
+        sprintf(hex, "%02X", buffer[i]);
+        result += hex;
+    }
+    return result.c_str();
 }
 
-void RFIDReader::readCard() {
+String RFIDReader::readCard() {
 
     //Serial.println(F("Reading card..."));
 
 	// Reset the loop if no new card present on the sensor/reader. This saves the entire process when idle.
 	if ( ! mfrc522.PICC_IsNewCardPresent()) {
-		return;
+		return "";
 	}
 
 	// Select one of the cards
 	if ( ! mfrc522.PICC_ReadCardSerial()) {
-		return;
+		return "";
 	}
 
 	// Dump debug info about the card; PICC_HaltA() is automatically called
-	mfrc522.PICC_DumpToSerial(&(mfrc522.uid));
-
+  String uidStr = dump_byte_array(mfrc522.uid.uidByte, mfrc522.uid.size);
+  Serial.println(uidStr.c_str());
+  mfrc522.PICC_HaltA();
+	//mfrc522.PICC_DumpToSerial(&(mfrc522.uid));
+  return uidStr;
 
 
 
@@ -116,19 +122,4 @@ void RFIDReader::readCard() {
     // mfrc522.PICC_HaltA();
 }
 
-/*
- * The function sending to the MFRC522 the needed commands to activate the reception
- */
-void RFIDReader::activateRec() {
-    mfrc522.PCD_WriteRegister(mfrc522.FIFODataReg, mfrc522.PICC_CMD_REQA);
-    mfrc522.PCD_WriteRegister(mfrc522.CommandReg, mfrc522.PCD_Transceive);
-    mfrc522.PCD_WriteRegister(mfrc522.BitFramingReg, 0x87);
-}
-
-/*
- * The function to clear the pending interrupt bits after interrupt serving routine
- */
-void RFIDReader::clearInt() {
-    mfrc522.PCD_WriteRegister(mfrc522.ComIrqReg, 0x7F);
-}
 

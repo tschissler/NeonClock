@@ -48,3 +48,7 @@ bool SDCardFileAccess::writeFile(const char* filename, const char* data) {
     file.close();
     return true;
 }
+
+SDFS& SDCardFileAccess::getSD() {
+    return SD;
+}

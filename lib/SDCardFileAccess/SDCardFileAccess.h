@@ -15,6 +15,7 @@ public:
     void init();
     bool readFile(const char* filename);
     bool writeFile(const char* filename, const char* data);
+    SDFS& getSD(); 
 
 private:
     SPIClass sd_spi;
