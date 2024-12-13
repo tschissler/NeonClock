@@ -1,6 +1,8 @@
 #ifndef SDCARDFILEACCESS_H
 #define SDCARDFILEACCESS_H
 
+#include <Arduino.h> // Include Arduino for Serial
+
 #include <SD.h>
 #include <SPI.h>
 

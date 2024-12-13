@@ -1,5 +1,4 @@
 #include "SDCardFileAccess.h"
-#include <Arduino.h> // Include Arduino for Serial
 
 #define welcomeFile "/neonclock.txt"
 
