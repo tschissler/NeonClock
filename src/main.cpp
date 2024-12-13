@@ -239,7 +239,7 @@ void loop() {
     }
 
     updateDigitsWithCurrentTime(digits);
-    Serial.println(digits);
+    //Serial.println(digits);
     neonDisplay.Show(digits);
 
     delay(40);

@@ -1,5 +1,6 @@
 #include "RTCModule.h"
-#include <Arduino.h> // Include Arduino for Serial
+#include <Arduino.h> 
+#include <Wire.h>
 
 RTCModule::RTCModule() : rtc() {}
 
