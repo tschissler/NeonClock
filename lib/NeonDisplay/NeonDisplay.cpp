@@ -28,7 +28,7 @@ void NeonDisplay::Show(char digits[5]) {
             if (digits[2] == ':') {
                 for (int x = 0; x < 10; x++) {
                     if (x == 2 || x == 3 || x == 6 || x == 7) {
-                        leds[ledIndex] = CRGB::Green;
+                        leds[ledIndex] = CRGB::Blue;
                     } else {
                         leds[ledIndex] = CRGB::Black;
                     }
@@ -38,7 +38,7 @@ void NeonDisplay::Show(char digits[5]) {
             else if (digits[2] >= '0' && digits[2] <= '9') {
                 int numLedsToShow = digits[2] - '0'; // Convert char to int
                 for (int x = 0; x < numLedsToShow; x++) {
-                    leds[ledIndex] = CRGB::Green; // Show Green LEDs
+                    leds[ledIndex] = CRGB::Blue; // Show Green LEDs
                     ledIndex++;
                 }
                 for (int x = numLedsToShow; x < 10; x++) {
@@ -61,7 +61,7 @@ void NeonDisplay::Show(char digits[5]) {
                     // Serial.println("digitIndex = " + String(digitIndex) + " groupSizes[segmentIndex] = " + String(groupSizes[segmentIndex]) + " ledIndex = " + String(ledIndex));
                     // Serial.println("Segments[digits[digitIndex]][segmentIndex] = " + String(Segments[digits[digitIndex]][segmentIndex]));
                     if (Segments[digits[digitIndex]][segmentIndex] == 1) {
-                        leds[ledIndex] = CRGB::Green;
+                        leds[ledIndex] = CRGB::Blue;
                     } else {
                         leds[ledIndex] = CRGB::Black;
                     }
@@ -71,6 +71,19 @@ void NeonDisplay::Show(char digits[5]) {
         }
     }
     FastLED.show();
+}
+
+void NeonDisplay::Blink() {
+    for (int i = 0; i < NUM_LEDS; i++) {
+        leds[i] = CRGB::Red;
+    }
+    FastLED.show();
+    delay(500);
+    for (int i = 0; i < NUM_LEDS; i++) {
+        leds[i] = CRGB::Black;
+    }
+    FastLED.show();
+    delay(500);
 }
 
 void NeonDisplay::Off() {

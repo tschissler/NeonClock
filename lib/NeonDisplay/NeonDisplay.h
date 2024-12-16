@@ -13,6 +13,7 @@ public:
     void Init();
     void Show(char digits[5]);
     void ShowTest();
+    void Blink();
     void Off();
     
 private:
