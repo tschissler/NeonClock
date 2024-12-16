@@ -1,6 +1,5 @@
 #include <SPI.h>
 #include <MFRC522.h>
-#include "Audio.h"
 #include <NimBLEDevice.h>
 
 #include "RTClib.h"
@@ -8,6 +7,7 @@
 #include "RFIDReader.h"
 #include "TimerModule.h"
 #include "NeonDisplay.h"
+#include "AudioModule.h"
 
 #include <Keypad.h>
 
@@ -25,9 +25,9 @@ std::map<String, TimeSpan> uidToTimeSpan = {
     {"0493B1D9220289", TimeSpan(0, 0, 20, 0)},
     {"0463C1D7220289", TimeSpan(0, 0, 30, 0)},
     {"0463F1D7220289", TimeSpan(0, 0, 45, 0)},
-    {"04137CC8220289", TimeSpan(0, 0, 60, 0)},
-    {"04F399C7220289", TimeSpan(0, 0, 75, 0)},
-    {"04C3D3C7220289", TimeSpan(0, 0, 90, 0)}
+    {"04137CC8220289", TimeSpan(0, 1, 0, 0)},
+    {"04F399C7220289", TimeSpan(0, 1, 15, 0)},
+    {"04C3D3C7220289", TimeSpan(0, 1, 30, 0)}
 };
 
 const byte ROWS = 5; // four rows
@@ -51,11 +51,8 @@ SDCardFileAccess sdCardFileAccess;
 RFIDReader rfidReader;
 TimerModule timerModule;
 NeonDisplay neonDisplay;
+AudioModule audioModule;
 
-#define MAX98357A_I2S_DOUT 25
-#define MAX98357A_I2S_BCLK 26
-#define MAX98357A_I2S_LRC 27
-Audio audio;
 int volume = 1;
 
 BLEServer *pServer = NULL;
@@ -194,10 +191,8 @@ void setup()
     Serial.println("");
 
     Serial.println(F("*************************************"));
-    Serial.println(F("Initializing and testing Audio"));
+    Serial.println(F("Testing Audio"));
     Serial.println(F("*************************************"));
-    audio.setPinout(MAX98357A_I2S_BCLK, MAX98357A_I2S_LRC, MAX98357A_I2S_DOUT);
-    audio.setVolume(11);
 
     // audio.connecttoSD("intro.wav");
 
@@ -239,7 +234,7 @@ void updateDigitsWithCurrentTime(char digits[])
 
 void updateDigitsFromTime(char digits[], TimeSpan time)
 {
-    int minutes = time.minutes();
+    int minutes = time.minutes() + time.hours() * 60;
     int seconds = time.seconds();
 
     digits[0] = '0' + (minutes / 10);
@@ -262,27 +257,28 @@ void loop()
         Serial.println(key);
         if (key == 'A')
         {
-            duration = duration + TimeSpan(0, 0, 1, 0);
+            duration = timerModule.getRemainingTime() + TimeSpan(0, 0, 1, 0);
+            timerModule.startTimer(duration);
             durationIsUpdated = true;
         }
         if (key == 'E')
         {
-            duration = duration + TimeSpan(0, 0, -1, 0);
+            duration = timerModule.getRemainingTime() + TimeSpan(0, 0, -1, 0);
+            timerModule.startTimer(duration);
             durationIsUpdated = true;
         }
         if (key == 'C' || key == 'D' || key == 'G' || key == 'H')
         {
-            audio.setVolume(volume);
-            audio.connecttoSD("Start.wav");
-            while (audio.isRunning())
-            {
-                audio.loop();
-            }
+
+            audioModule.playAudio("Start.wav", volume);
             timerModule.startTimer(duration);
             timerIsStarted = true;
         }
         if (key == 'T')
         {
+            duration = TimeSpan(0, 0, 0, 0);
+            timerModule.stopTimer();
+            durationIsUpdated = true;
             timerIsStarted = false;
         }
     }
@@ -337,12 +333,7 @@ void loop()
             duration = uidToTimeSpan[uid];
             durationIsUpdated = true;
 
-            audio.setVolume(volume);
-            audio.connecttoSD("confirm.wav");
-            while (audio.isRunning())
-            {
-                audio.loop();
-            }        
+            audioModule.playAudioAsync("confirm.wav", volume);     
         }
     }
 

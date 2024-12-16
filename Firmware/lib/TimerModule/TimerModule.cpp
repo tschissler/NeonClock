@@ -27,6 +27,10 @@ void TimerModule::startTimer(TimeSpan duration) {
     Serial.println(endTime);
 }
 
+void TimerModule::stopTimer() {
+    endTime = 0;
+}
+
 TimeSpan TimerModule::getRemainingTime() {
     time_t now = time(nullptr);
     time_t remainingSeconds = endTime - now;

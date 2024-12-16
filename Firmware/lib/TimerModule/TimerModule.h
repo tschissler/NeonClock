@@ -9,10 +9,11 @@ public:
     void init();
     DateTime getCurrentTime();
     void startTimer(TimeSpan duration);
+    void stopTimer();
     TimeSpan getRemainingTime();
 
     bool isTimerRunning();
-    
+
 private:
     RTC_DS1307 rtc;
     time_t endTime;
