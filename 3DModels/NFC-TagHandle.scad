@@ -13,7 +13,8 @@ CaseHeight = 14 * FullHeight + 2;
 
 invers = true;
 //Tag();
-Case();
+//Case();
+CaseCap();
 
 module Tag()
 {
@@ -30,7 +31,7 @@ module Case()
 {
     difference()
     {
-        cylinder(h=CaseHeight+WallThickness, d=BaseDiameter+1+WallThickness);
+        cylinder(h=CaseHeight+WallThickness, d=BaseDiameter+1+2*WallThickness);
         translate([0,0,WallThickness])
             cylinder(h=CaseHeight, d=BaseDiameter+1);
     }
@@ -40,9 +41,9 @@ module CaseCap()
 {
     difference()
     {
-        cylinder(h=CaseCapHeigh+WallThickness, d=BaseDiameter+1+2*WallThickness);
+        cylinder(h=CaseCapHeigh+WallThickness, d=BaseDiameter+1+4*WallThickness);
         translate([0,0,WallThickness])
-            cylinder(h=CaseCapHeigh, d=BaseDiameter+1++WallThickness);
+            cylinder(h=CaseCapHeigh, d=BaseDiameter+1+2*WallThickness);
     }
 }
 
